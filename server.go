@@ -18,6 +18,7 @@ func serverConnect(port string) {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		websocket, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Println(err)
