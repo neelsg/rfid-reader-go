@@ -41,12 +41,10 @@ func readerDisconnect() {
 	readerConnected = false
 }
 
-func readerProcessRead(buffer []byte, mLen int, err error) {
-	if err != nil {
-		fmt.Println("error reading: ", err.Error())
-		return
+func readerProcessRead(buffer []byte, mLen int) {
+	if mainDebug {
+		fmt.Println("reader process:", hex.EncodeToString(buffer[:mLen]))
 	}
-
 	if mLen < 8 {
 		fmt.Println("data err: too short: ", hex.EncodeToString(buffer[:mLen]))
 		return
@@ -58,8 +56,8 @@ func readerProcessRead(buffer []byte, mLen int, err error) {
 	}
 
 	if (mLen - 3) > int(buffer[3]) {
-		readerProcessRead(buffer[0:buffer[3]+3], int(buffer[3]+3), nil)
-		readerProcessRead(buffer[buffer[3]+3:], mLen-int(buffer[3]+3), nil)
+		readerProcessRead(buffer[0:buffer[3]+3], int(buffer[3]+3))
+		readerProcessRead(buffer[buffer[3]+3:], mLen-int(buffer[3]+3))
 		return
 	}
 
@@ -88,10 +86,14 @@ func readerProcessRead(buffer []byte, mLen int, err error) {
 }
 
 func readerProcess() {
+	buffer := make([]byte, 1024)
 	for {
-		buffer := make([]byte, 1024)
 		mLen, err := readerConnection.Read(buffer)
-		readerProcessRead(buffer, mLen, err)
+		if err == nil {
+			readerProcessRead(buffer, mLen)
+		} else {
+			fmt.Println("error reading: ", err.Error())
+		}
 	}
 }
 

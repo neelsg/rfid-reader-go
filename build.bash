@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-platforms=("windows/amd64" "linux/amd64" "darwin/amd64")
+platforms=("windows/amd64" "linux/amd64")
 
 for platform in "${platforms[@]}"
 do
